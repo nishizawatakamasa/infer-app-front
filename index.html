@@ -80,6 +80,7 @@
                 console.log(response);
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data);
                     predictionResult.textContent = `Predicted Weight: ${data.weight.toFixed(2)} kg`;
                 } else {
                     predictionResult.textContent = `Error: ${response.statusText}`;
