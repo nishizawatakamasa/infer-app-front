@@ -6,62 +6,64 @@
     <title>Weight Prediction</title>
     <style>
         body {
-            font-family: sans-serif;
-            background-color: #f0f0f0; /* Light gray background */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background-color: #ffffff;
+            display: grid;
+            place-content: center;
             height: 100vh;
             margin: 0;
         }
 
         .container {
-            background-color: #fff; /* White container */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            padding: 3px;
             width: 300px;
             text-align: center;
         }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc; /* Light gray border */
-            border-radius: 4px;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        
+        .inputs {
+            display: flex;
+            margin: 10px;
         }
 
+        input[type="number"] {
+            background-color: #e8f0fe;
+            width: 100%;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+        
         button {
-            background-color: #666; /* Dark gray button */
-            color: white;
+            background-color: #716eff;
             padding: 10px 15px;
+            margin: 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s; /* Smooth transition for hover effect */
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px #808080;
         }
-
+        
         button:hover {
-            background-color: #333; /* Even darker gray on hover */
+            background-color: #4340ff;
         }
-
+        
         #predictionResult {
-            margin-top: 20px;
+            margin: 15px;
+            padding: 5px;
             font-size: 1.2em;
-            color: #555; /* Medium gray text */
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Weight Prediction</h1>
-        <input type="number" id="age" placeholder="Age" min="1">
-        <input type="number" id="height" placeholder="Height (cm)" min="1">
-        <button onclick="predictWeight()">Predict Weight</button>
+        <div class="inputs">
+            <input type="number" id="age" placeholder="Age" min="1">
+            <input type="number" id="height" placeholder="Height (cm)" min="1">
+        </div>
         <div id="predictionResult">Enter age and height to see prediction.</div>
+        <button onclick="predictWeight()">Predict Weight</button>
     </div>
 
     <script>
@@ -77,10 +79,8 @@
 
             try {
                 const response = await fetch(`https://infer-app.onrender.com/predict?age=${age}&height=${height}`);
-                console.log(response);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     predictionResult.textContent = `Predicted Weight: ${data.weight.toFixed(2)} kg`;
                 } else {
                     predictionResult.textContent = `Error: ${response.statusText}`;
