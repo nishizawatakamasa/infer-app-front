@@ -1,53 +1,60 @@
 import React, { useState } from 'react';
-
-// interface PredictionRequest {
-//     age: number;
-//     height: number;
-// }
+import axios from 'axios';
 
 interface PredictionResponse {
     weight: number;
 }
 
-function WeightPrediction() {
-    const [age, setAge] = useState<string>('');
-    const [height, setHeight] = useState<string>('');
-    const [weight, setWeight] = useState<string>(''); // String to display
+const WeightPrediction = () => {
+    const [age, setAge] = useState<number | null>(null);
+    const [height, setHeight] = useState<number | null>(null);
+    const [weight, setWeight] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const parsedValue = value === '' ? null : Number(value);
+        switch (name) {
+            case "age":
+                setAge(parsedValue);
+                break;
+            case "height":
+                setHeight(parsedValue);
+                break;
+        }
+    };
 
     const predictWeight = async (): Promise<void> => {
         setError('');
         setWeight('');
 
-        if (!age || !height) {
+        if (age === null || height === null) {
             setError("Please enter both age and height.");
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await fetch(`https://infer-app.onrender.com/predict?age=${age}&height=${height}`);
-            if (response.ok) {
-                const data: PredictionResponse = await response.json();
-                setWeight(`Predicted Weight: ${data.weight.toFixed(2)} kg`);
+            const response = await axios.get<PredictionResponse>(`https://infer-app.onrender.com/predict`, {
+                params: {
+                    age: age,
+                    height: height
+                }
+            });
+
+            setWeight(`Predicted Weight: ${response.data.weight.toFixed(2)} kg`);
+
+        } catch (error: any) {
+            if (axios.isAxiosError(error)) {
+                setError(`Error: ${error.message}`);
             } else {
-                setError(`Error: ${response.statusText}`);
+                setError(`An unexpected error occurred: ${error.message}`);
             }
-        } catch (e:any) {
-            setError(`An error occurred: ${e.message}`);
         } finally {
             setIsLoading(false);
         }
     };
-
-    const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAge(e.target.value);
-    }
-
-    const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setHeight(e.target.value);
-    }
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-white">
@@ -55,20 +62,20 @@ function WeightPrediction() {
                 <div className="inputs flex m-2">
                     <input
                         type="number"
-                        id="age"
+                        name="age"
                         placeholder="Age"
                         min="1"
-                        value={age}
-                        onChange={handleAgeChange}
+                        value={age === null ? '' : age.toString()}
+                        onChange={handleInputChange}
                         className="bg-blue-50 w-full p-1 m-1 rounded-md border-none"
                     />
                     <input
                         type="number"
-                        id="height"
+                        name="height"
                         placeholder="Height (cm)"
                         min="1"
-                        value={height}
-                        onChange={handleHeightChange}
+                        value={height === null ? '' : height.toString()}
+                        onChange={handleInputChange}
                         className="bg-blue-50 w-full p-1 m-1 rounded-md border-none"
                     />
                 </div>
