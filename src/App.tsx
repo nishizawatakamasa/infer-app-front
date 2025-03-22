@@ -47,7 +47,11 @@ const WeightPrediction = () => {
 
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
-                setError(`Error: ${error.message}`);
+                if (error.response) {
+                    setError(`${error.response.status} ${error.response.data.detail}`);
+                } else {
+                    setError('Error: Network Error');
+                }
             } else {
                 setError(`An unexpected error occurred: ${error.message}`);
             }
